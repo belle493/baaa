@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lumeo · Iniciar sesión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,700;8..60,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#ffffff;
+    --navy-900:#050d26;
+    --navy-800:#081433;
+    --navy-700:#0c1d4d;
+    --blue-600:#1546c8;
+    --blue-link:#6fb9ff;
+    --icon:#8cc6ff;
+    --yellow:#f6c344;
+    --teal:#3cc0cf;
+    --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+    --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{
+    background:var(--navy-900);
+    -webkit-text-size-adjust:100%; /* iOS no reescala el texto al girar */
+    text-size-adjust:100%;
+    scrollbar-gutter:stable;       /* evita el "salto" al bloquear el scroll en escritorio */
+  }
+  /* Quita el retardo/zoom por doble toque en elementos interactivos */
+  button,a,input{touch-action:manipulation}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--navy-900);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    position:relative;
+    max-width:460px;
+    margin:0 auto;
+    min-height:100vh;
+    min-height:100dvh; /* altura real en móvil (barra del navegador) */
+    overflow-x:clip; /* "clip" (y no "hidden") para que el header sticky funcione */
+    background:var(--navy-900);
+  }
+
+  /* ---------- Hero con fondo degradado ---------- */
+  .hero{
+    position:relative;
+    padding:104px 20px 28px;
+    background:
+      radial-gradient(120% 60% at 85% 0%, #1f6bff 0%, rgba(31,107,255,0) 60%),
+      radial-gradient(90% 50% at 0% 35%, #0a3bb8 0%, rgba(10,59,184,0) 65%),
+      linear-gradient(180deg, #0a2f9c 0%, #0a1f6b 45%, #071443 100%);
+  }
+  .hero::before,.hero::after{
+    content:"";position:absolute;border-radius:50%;pointer-events:none;
+  }
+  .hero::before{
+    width:520px;height:520px;right:-260px;top:-120px;
+    background:radial-gradient(circle at 30% 30%, rgba(80,160,255,.45), rgba(80,160,255,0) 65%);
+    filter:blur(6px);
+  }
+  .hero::after{
+    width:420px;height:420px;left:-200px;top:260px;
+    background:radial-gradient(circle at 60% 40%, rgba(20,90,255,.35), rgba(20,90,255,0) 65%);
+  }
+
+  header{
+    position:sticky;top:0;z-index:20;
+    height:92px;margin-bottom:-92px;
+    padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;
+    transition:background .25s, backdrop-filter .25s, box-shadow .25s;
+  }
+  header.scrolled{
+    background:rgba(5,13,38,.82);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 1px 0 rgba(255,255,255,.06);
+  }
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+  .logo svg{width:38px;height:38px;flex:none}
+  .logo span{
+    font-family:var(--serif);font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1;
+  }
+  .top-actions{display:flex;gap:12px}
+  .round-btn{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    background:none;border:0;color:#fff;font:500 12px var(--sans);cursor:pointer;
+  }
+  .round-btn i{
+    display:grid;place-items:center;width:48px;height:48px;border-radius:50%;
+    background:rgba(5,16,60,.72);
+    border:1px solid rgba(255,255,255,.08);
+    transition:background .2s, transform .2s;
+  }
+  .round-btn:hover i{background:rgba(5,16,60,.95);transform:translateY(-1px)}
+  .round-btn svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---------- Tarjeta de inicio de sesión ---------- */
+  .login-card{
+    position:relative;z-index:2;
+    background:rgba(8,22,64,.78);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:22px;
+    padding:20px 20px 22px;
+  }
+  .login-card h1{
+    font-family:var(--serif);font-weight:700;
+    font-size:40px;line-height:1.05;letter-spacing:-.015em;
+    margin-bottom:22px;
+  }
+  .btn-login{
+    display:block;width:100%;
+    padding:17px 16px;border:0;border-radius:10px;
+    background:#fff;color:#0b2a8f;
+    font:700 17px var(--sans);
+    cursor:pointer;
+    transition:box-shadow .2s, transform .1s;
+  }
+  .btn-login:hover{box-shadow:0 6px 22px rgba(255,255,255,.22)}
+  .btn-login:active{transform:scale(.99)}
+  .btn-login:focus-visible,.link:focus-visible,.shortcut:focus-visible{outline:3px solid var(--blue-link);outline-offset:3px}
+  .note{margin:20px 0 14px;font-size:15px;line-height:1.35;color:#e6ecff}
+  .link{
+    display:inline-block;color:var(--blue-link);font-weight:600;font-size:15px;text-decoration:none;
+  }
+  .link:hover{text-decoration:underline}
+
+  .shortcuts{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+    margin-top:26px;
+  }
+  .shortcut{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    background:none;border:0;color:#fff;cursor:pointer;
+    font:500 14px/1.2 var(--sans);text-align:center;text-decoration:none;
+  }
+  .shortcut i{
+    display:grid;place-items:center;width:68px;height:68px;border-radius:50%;
+    background:#09153a;
+    transition:background .2s, transform .2s;
+  }
+  .shortcut:hover i{background:#0e1f55;transform:translateY(-2px)}
+  .shortcut svg{width:30px;height:30px;stroke:var(--icon);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .shortcut .mini-logo{width:15px;height:15px;vertical-align:-3px;margin-right:3px}
+
+  /* ---------- Sección inferior ---------- */
+  .more{
+    position:relative;z-index:2;
+    margin-top:-6px;
+    background:var(--navy-900);
+    border-radius:26px 26px 0 0;
+    padding:26px 20px 40px;
+  }
+  .more h2{
+    font-family:var(--serif);font-weight:700;
+    font-size:27px;line-height:1.15;letter-spacing:-.01em;
+    margin-bottom:18px;
+  }
+  .promo{
+    background:#0e1a38;
+    border-radius:20px;
+    padding:18px 22px 30px;
+  }
+  .promo svg.art{display:block;width:100%;height:auto;margin:6px auto 22px}
+  .promo h3{
+    font-family:var(--serif);font-weight:700;
+    font-size:28px;line-height:1.15;letter-spacing:-.01em;
+    margin-bottom:12px;
+  }
+  .promo p{font-size:17px;line-height:1.45;color:#cdd7f2;margin-bottom:22px}
+  .btn-ghost{
+    display:inline-block;padding:13px 22px;border-radius:10px;
+    border:1.5px solid rgba(255,255,255,.55);color:#fff;text-decoration:none;
+    font:600 15px var(--sans);transition:background .2s;
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,.1)}
+
+  .btn-light{
+    display:block;width:100%;text-align:center;
+    padding:17px 16px;border-radius:10px;
+    background:#7cc3ff;color:#0a1f5c;text-decoration:none;
+    font:700 17px var(--sans);
+    transition:background .2s, transform .1s;
+  }
+  .btn-light:hover{background:#98d0ff}
+  .btn-light:active{transform:scale(.99)}
+  .btn-light:focus-visible{outline:3px solid #fff;outline-offset:3px}
+
+  .more h2.second{margin-top:36px}
+  .try{
+    background:#0e1a38;
+    border-radius:20px;
+    padding:18px 18px 22px;
+  }
+  .try .photo{
+    display:block;width:100%;height:auto;border-radius:6px;margin-bottom:18px;
+  }
+  .try h3{
+    font-family:var(--sans);font-weight:700;
+    font-size:27px;line-height:1.2;
+    margin-bottom:12px;
+  }
+  .try p{font-size:17px;line-height:1.45;color:#cdd7f2;margin-bottom:22px}
+  .try .link{font-size:17px;margin-bottom:26px}
+
+  /* ================= Desplegable de inicio de sesión ================= */
+  /* Se bloquea solo el scroll de la página de fondo; NADA se pone en
+     position:fixed sobre el body, así que no se "salta" ni se descoloca. */
+  html.sheet-open, html.sheet-open body{overflow:hidden}
+
+  .overlay{
+    position:fixed;left:0;right:0;top:0;
+    height:100%;height:100dvh;        /* JS lo ajusta al viewport visual (teclado) */
+    z-index:100;
+    display:flex;align-items:flex-end;justify-content:center;
+    visibility:hidden;
+    transition:visibility 0s linear .42s;
+  }
+  .overlay.open{visibility:visible;transition-delay:0s}
+
+  .backdrop{
+    position:absolute;left:0;right:0;bottom:0;top:-100vh; /* cubre también si iOS desplaza la vista */
+    background:rgba(2,6,20,.66);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+    opacity:0;transition:opacity .38s ease;
+  }
+  .overlay.open .backdrop{opacity:1}
+
+  .sheet{
+    position:relative;
+    width:100%;max-width:460px;
+    max-height:calc(100% - 12px);
+    overflow-y:auto;overscroll-behavior:contain;
+    background:#0d1830;
+    border-radius:26px 26px 0 0;
+    padding:0 20px calc(24px + env(safe-area-inset-bottom));
+    transform:translateY(100%);
+    transition:transform .45s cubic-bezier(.22,.9,.24,1);
+    will-change:transform;
+  }
+  .overlay.open .sheet{transform:translateY(0)}
+
+  .sheet-head{
+    position:relative;
+    padding-top:16px;height:124px;
+  }
+  .grabber{display:block;width:68px;height:3px;border-radius:2px;background:#fff;margin:0 auto}
+  .sheet-head h2{
+    position:absolute;left:0;right:0;top:50px;
+    text-align:center;font:600 18px var(--sans);
+    pointer-events:none;
+  }
+  .close{
+    position:absolute;right:-4px;top:30px;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    background:none;border:0;color:var(--blue-link);
+    font:600 12px var(--sans);cursor:pointer;padding:4px;
+  }
+  .close i{
+    display:grid;place-items:center;width:48px;height:48px;border-radius:50%;
+    background:#0a1330;transition:background .2s;
+  }
+  .close:hover i{background:#12224f}
+  .close svg{width:24px;height:24px;stroke:var(--blue-link);fill:none;stroke-width:1.8;stroke-linecap:round}
+
+  .field{position:relative;margin-bottom:18px}
+  .field input{
+    display:block;width:100%;height:66px;
+    padding:27px 56px 8px 18px;
+    background:#01040c;color:#fff;
+    border:2px solid #fff;border-radius:10px;
+    font:400 17px/1.2 var(--sans);   /* ≥16px: iOS NO hace zoom al enfocar */
+    -webkit-appearance:none;appearance:none;
+    caret-color:#fff;
+    transition:box-shadow .2s;
+  }
+  .field input:focus{outline:none;box-shadow:0 0 0 4px rgba(124,195,255,.35)}
+  .field input::placeholder{color:transparent}
+  .field label{
+    position:absolute;left:20px;top:21px;
+    font:400 17px/1.2 var(--sans);color:#d5def5;
+    pointer-events:none;
+    transform-origin:left top;
+    transition:transform .18s ease, color .18s ease;
+  }
+  .field input:focus + label,
+  .field input:not(:placeholder-shown) + label{
+    transform:translateY(-12px) scale(.8);
+  }
+  .field-btn{
+    position:absolute;right:4px;top:10px;
+    width:46px;height:46px;border:0;border-radius:50%;
+    display:grid;place-items:center;
+    background:none;color:#fff;cursor:pointer;
+  }
+  .field-btn:hover{background:rgba(255,255,255,.08)}
+  .field-btn:focus-visible{outline:3px solid var(--blue-link)}
+  .field-btn[hidden]{display:none}
+  .field-btn svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .field-btn .eye-off{display:none}
+  .field-btn.is-visible .eye{display:none}
+  .field-btn.is-visible .eye-off{display:block}
+
+  .forgot{display:inline-block;margin:2px 0 26px;font-size:17px}
+  .btn-submit{
+    display:block;width:100%;padding:18px 16px;border:0;border-radius:10px;
+    font:700 17px var(--sans);cursor:pointer;
+    background:#7cc3ff;color:#0a1f5c;
+    transition:background .2s, color .2s, transform .1s;
+  }
+  .btn-submit:disabled{background:#222d4b;color:#56648c;cursor:not-allowed}
+  .btn-submit:not(:disabled):hover{background:#98d0ff}
+  .btn-submit:not(:disabled):active{transform:scale(.99)}
+  .btn-submit:focus-visible{outline:3px solid #fff;outline-offset:3px}
+  .form-note{min-height:22px;margin-top:14px;font-size:14px;line-height:1.4;color:#a9b7de;text-align:center}
+
+  /* ---- Modo compacto: teclado abierto o pantalla baja ----
+     Todo el formulario cabe en el hueco que deja el teclado. */
+  .overlay.kb .sheet{
+    max-height:100%;
+    padding-bottom:calc(14px + env(safe-area-inset-bottom));
+    border-radius:20px 20px 0 0;
+  }
+  .overlay.kb .sheet-head{height:66px;padding-top:12px}
+  .overlay.kb .sheet-head h2{top:26px;font-size:17px}
+  .overlay.kb .close{top:12px;right:-6px;padding:2px}
+  .overlay.kb .close i{width:40px;height:40px}
+  .overlay.kb .close-label{display:none}
+  .overlay.kb .field{margin-bottom:12px}
+  .overlay.kb .field input{height:58px;padding-top:23px;padding-bottom:6px}
+  .overlay.kb .field label{top:17px}
+  .overlay.kb .field input:focus + label,
+  .overlay.kb .field input:not(:placeholder-shown) + label{transform:translateY(-11px) scale(.8)}
+  .overlay.kb .field-btn{top:6px}
+  .overlay.kb .forgot{margin:0 0 14px;font-size:16px}
+  .overlay.kb .btn-submit{padding:15px 16px}
+  .overlay.kb .form-note{min-height:0;margin-top:8px}
+  /* Con el teclado, el panel se prolonga por debajo para que no se
+     vea la página a través del teclado translúcido de iOS. */
+  .overlay.kb::after{
+    content:"";position:absolute;left:0;right:0;top:100%;height:70vh;
+    background:#0d1830;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .sheet,.backdrop,.field label{transition-duration:.01s}
+  }
+
+  @media (min-width:520px){
+    body{background:radial-gradient(80% 60% at 50% 0%, #0d2a80 0%, #050d26 70%)}
+    .app{box-shadow:0 0 80px rgba(0,0,0,.55)}
+  }
+</style>
+</head>
+<body>
+<!-- Símbolos reutilizables -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7fd3ff"/>
+      <stop offset="1" stop-color="#2f6bff"/>
+    </linearGradient>
+    <symbol id="lumeo-mark" viewBox="0 0 40 40">
+      <rect width="40" height="40" rx="11" fill="url(#lg)"/>
+      <path d="M14 9v16.5a4.5 4.5 0 0 0 4.5 4.5H29" fill="none" stroke="#fff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="27.5" cy="12.5" r="3.6" fill="#fff"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <header id="top">
+    <a class="logo" href="#" aria-label="Lumeo">
+      <svg aria-hidden="true"><use href="#lumeo-mark"/></svg>
+      <span>lumeo</span>
+    </a>
+    <div class="top-actions">
+      <button class="round-btn" type="button">
+        <i><svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 20.5l1.5-4.9A8.5 8.5 0 1 1 21 11.5z"/></svg></i>
+        Ayuda
+      </button>
+      <button class="round-btn" type="button">
+        <i><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></i>
+        Menú
+      </button>
+    </div>
+  </header>
+
+  <div class="hero">
+
+    <section class="login-card">
+      <h1>Buenas tardes</h1>
+      <button class="btn-login" id="openLogin" type="button" aria-haspopup="dialog" aria-controls="loginSheet">Iniciar sesión</button>
+      <p class="note">Si ya eres usuario de Lumeo pero no eres usuario online.</p>
+      <a class="link" href="#">Crear clave de acceso</a>
+
+      <nav class="shortcuts" aria-label="Accesos rápidos">
+        <a class="shortcut" href="#">
+          <i><svg viewBox="0 0 24 24"><circle cx="9.5" cy="8" r="3.6"/><path d="M3 20c0-3.6 2.9-6 6.5-6 1.3 0 2.5.3 3.4.9"/><circle cx="18" cy="17.5" r="4.2" fill="#09153a"/><path d="M18 15.4v4.2M15.9 17.5h4.2"/></svg></i>
+          Hazte VIP
+        </a>
+        <a class="shortcut" href="#">
+          <i><svg viewBox="0 0 24 24"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V19a1 1 0 0 0 1 1h4.2"/><path d="M18.5 9.5v3"/><path d="M17 20.5s3.4-2.9 3.4-5.4a3.4 3.4 0 0 0-6.8 0c0 2.5 3.4 5.4 3.4 5.4z"/><circle cx="17" cy="15.2" r="1.1"/></svg></i>
+          <span><svg class="mini-logo" aria-hidden="true"><use href="#lumeo-mark"/></svg>Valora casas</span>
+        </a>
+        <a class="shortcut" href="#">
+          <i><svg viewBox="0 0 24 24"><path d="M12 21s6.5-5.4 6.5-11A6.5 6.5 0 0 0 5.5 10c0 5.6 6.5 11 6.5 11z"/><path d="M9.6 7.2h4.8M9.6 10h4.8M9.6 12.8h4.8" stroke-width="1.6"/></svg></i>
+          Oficinas
+        </a>
+        <a class="shortcut" href="#">
+          <i><svg viewBox="0 0 24 24"><circle cx="9.5" cy="8" r="3.6"/><path d="M3 20c0-3.6 2.9-6 6.5-6"/><circle cx="17.5" cy="16.5" r="5" fill="#09153a"/><path d="M19.4 14.4a3 3 0 1 0 0 4.2M15 16h3.6M15 17.6h3.6" stroke-width="1.5"/></svg></i>
+          Compartir gastos
+        </a>
+      </nav>
+    </section>
+  </div>
+
+  <section class="more">
+    <h2>¿Aún no eres usuario de Lumeo?</h2>
+    <article class="promo">
+      <!-- Ilustración original: móvil + tarjeta + 0 € -->
+      <svg class="art" viewBox="0 0 400 270" role="img" aria-label="Móvil con tarjeta y cero euros de comisiones">
+        <defs>
+          <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#6fe0e6"/>
+            <stop offset="1" stop-color="#2aa6b8"/>
+          </linearGradient>
+        </defs>
+        <!-- sombra -->
+        <ellipse cx="205" cy="245" rx="150" ry="14" fill="#000" opacity=".25"/>
+        <!-- móvil inclinado -->
+        <g transform="translate(40 40) skewY(-14) scale(1 .98)">
+          <rect x="0" y="40" width="210" height="150" rx="22" fill="#f4f8fb"/>
+          <rect x="10" y="50" width="190" height="130" rx="14" fill="#35b6c6"/>
+          <rect x="0" y="180" width="210" height="14" rx="7" fill="#c9d6dd" opacity=".9"/>
+        </g>
+        <!-- tarjeta -->
+        <g transform="translate(205 28) rotate(-6)">
+          <rect width="170" height="105" rx="12" fill="url(#card)"/>
+          <rect x="14" y="14" width="22" height="22" rx="7" fill="#fff" opacity=".9"/>
+          <path d="M20 19v10a3 3 0 0 0 3 3h7" fill="none" stroke="#2aa6b8" stroke-width="3" stroke-linecap="round"/>
+          <text x="44" y="31" font-family="Source Serif 4, Georgia, serif" font-weight="800" font-size="15" fill="#fff">lumeo</text>
+          <rect x="14" y="62" width="60" height="6" rx="3" fill="#fff" opacity=".55"/>
+          <circle cx="132" cy="84" r="11" fill="#fff" opacity=".75"/>
+          <circle cx="146" cy="84" r="11" fill="#fff" opacity=".45"/>
+        </g>
+        <!-- 0 € -->
+        <text x="118" y="196" font-family="Source Serif 4, Georgia, serif" font-weight="800" font-size="150" fill="#f6c344" stroke="#0e1a38" stroke-width="3" paint-order="stroke">0</text>
+        <circle cx="230" cy="168" r="30" fill="#f6c344" stroke="#0e1a38" stroke-width="3"/>
+        <text x="230" y="181" text-anchor="middle" font-family="Public Sans, sans-serif" font-weight="800" font-size="38" fill="#0e1a38">€</text>
+      </svg>
+
+      <h3>¿Aún pagas comisiones por tu cuenta?</h3>
+      <p>Descubre todas las opciones que tenemos para ti y elige la que mejor se adapta a tus necesidades.</p>
+      <a class="btn-light" href="#">Hazte de Lumeo</a>
+    </article>
+
+    <h2 class="second">Si lo prefieres, puedes conocernos poco a poco</h2>
+    <article class="try">
+      <!-- Ilustración original: persona con el móvil sentada en la cama -->
+      <svg class="photo" viewBox="0 0 400 250" role="img" aria-label="Persona sentada en una cama usando la app en el móvil">
+        <defs>
+          <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#4a5560"/>
+            <stop offset="1" stop-color="#6a7580"/>
+          </linearGradient>
+        </defs>
+        <rect width="400" height="250" fill="url(#wall)"/>
+        <!-- cortina -->
+        <rect x="330" y="0" width="70" height="250" fill="#d9d0c6"/>
+        <path d="M345 0v250M362 0v250M379 0v250" stroke="#c2b8ad" stroke-width="3"/>
+        <!-- cabecero y almohadas -->
+        <rect x="40" y="70" width="170" height="110" rx="14" fill="#3b444e"/>
+        <rect x="70" y="105" width="120" height="70" rx="18" fill="#6c7782"/>
+        <!-- cama -->
+        <path d="M0 190 Q120 165 260 178 T400 190 V250 H0 Z" fill="#8a949e"/>
+        <path d="M0 215 Q140 195 400 212 V250 H0 Z" fill="#767f89"/>
+        <!-- maleta naranja -->
+        <path d="M205 238 L330 222 L345 250 H215 Z" fill="#c9502a"/>
+        <path d="M215 236 L336 222" stroke="#8f3418" stroke-width="3"/>
+        <!-- piernas -->
+        <path d="M150 168 Q205 150 260 172 L300 212 Q275 224 252 210 Q215 192 180 198 Z" fill="#b2bcc0"/>
+        <path d="M252 140 Q290 150 300 190 L270 196 Q258 168 236 160 Z" fill="#a3aeb3"/>
+        <!-- torso naranja -->
+        <path d="M128 70 Q172 55 205 72 L236 168 Q196 188 150 176 Z" fill="#e8962c"/>
+        <path d="M150 96 Q175 118 172 160" stroke="#c97b1a" stroke-width="3" fill="none"/>
+        <!-- brazo y móvil -->
+        <path d="M205 82 Q245 96 252 130 L236 138 Q226 112 196 104 Z" fill="#e8962c"/>
+        <g transform="rotate(-14 262 118)">
+          <rect x="246" y="92" width="30" height="50" rx="6" fill="#b02d55"/>
+          <rect x="250" y="97" width="22" height="38" rx="3" fill="#f6c0d0"/>
+        </g>
+        <ellipse cx="248" cy="136" rx="9" ry="6" fill="#f0c3a0"/>
+        <!-- cabeza -->
+        <rect x="158" y="52" width="22" height="26" rx="8" fill="#f0c3a0"/>
+        <path d="M130 56 Q128 18 168 14 Q206 14 206 52 Q208 90 196 116 Q190 80 176 70 Q150 72 134 92 Q126 78 130 56 Z" fill="#e6c27a"/>
+        <ellipse cx="172" cy="52" rx="19" ry="23" fill="#f0c3a0"/>
+        <path d="M152 44 Q172 20 196 40 Q186 32 168 34 Q156 36 152 44 Z" fill="#e6c27a"/>
+        <!-- insignia amarilla con brújula -->
+        <rect x="250" y="38" width="86" height="42" rx="6" fill="#f6dc3c"/>
+        <circle cx="293" cy="59" r="14" fill="none" stroke="#14308f" stroke-width="3.5"/>
+        <path d="M287 65l12-12M290 52l9 1 1 9" stroke="#14308f" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+
+      <h3>Prueba la app Lumeo sin ser cliente</h3>
+      <p>Podrás utilizar las funcionalidades más destacadas de la app para tu día a día, como pedir cita, agregar tus cuentas o calcular el valor de una casa. Regístrate en dos pasos, sin compromiso.</p>
+      <a class="link" href="#">Más información</a>
+      <a class="btn-light" href="#">Regístrate</a>
+    </article>
+  </section>
+</div>
+
+<!-- Desplegable de inicio de sesión -->
+<div class="overlay" id="loginOverlay" aria-hidden="true" inert>
+  <div class="backdrop"></div>
+  <section class="sheet" id="loginSheet" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="sheet-head">
+      <span class="grabber" aria-hidden="true"></span>
+      <h2 id="loginTitle">Iniciar sesión</h2>
+      <button class="close" type="button" data-close aria-label="Cerrar">
+        <i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></i>
+        <span class="close-label" aria-hidden="true">Cerrar</span>
+      </button>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <input id="user" name="username" type="text" placeholder=" "
+               autocomplete="username" autocapitalize="none" autocorrect="off"
+               spellcheck="false" enterkeyhint="next">
+        <label for="user">Usuario</label>
+        <button class="field-btn" id="clearUser" type="button" hidden aria-label="Borrar usuario">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </button>
+      </div>
+
+      <div class="field">
+        <input id="pass" name="password" type="password" placeholder=" "
+               autocomplete="current-password" autocapitalize="none" autocorrect="off"
+               spellcheck="false" enterkeyhint="go">
+        <label for="pass">Clave de acceso</label>
+        <button class="field-btn" id="togglePass" type="button"
+                aria-label="Mostrar clave de acceso" aria-pressed="false" aria-controls="pass">
+          <!-- ojo: mostrar -->
+          <svg class="eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          <!-- ojo tachado: ocultar -->
+          <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5c2 0 3.7.6 5.1 1.4M22 12s-3.6 6.5-10 6.5c-2 0-3.7-.6-5.1-1.4"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M4 4l16 16"/></svg>
+        </button>
+      </div>
+
+      <a class="link forgot" href="#">¿Has olvidado tu clave de acceso?</a>
+      <button class="btn-submit" id="submitLogin" type="submit" disabled>Iniciar sesión</button>
+      <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+</div>
+
+<script>
+  /* ---------- Cabecera fija: se oscurece al deslizar ---------- */
+  (function () {
+    var header = document.getElementById('top');
+    function onScroll() { header.classList.toggle('scrolled', window.scrollY > 24); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  /* ---------- Desplegable de inicio de sesión ---------- */
+  (function () {
+    var html     = document.documentElement;
+    var opener   = document.getElementById('openLogin');
+    var overlay  = document.getElementById('loginOverlay');
+    var sheet    = document.getElementById('loginSheet');
+    var form     = document.getElementById('loginForm');
+    var user     = document.getElementById('user');
+    var pass     = document.getElementById('pass');
+    var clearBtn = document.getElementById('clearUser');
+    var toggle   = document.getElementById('togglePass');
+    var submit   = document.getElementById('submitLogin');
+    var note     = document.getElementById('formNote');
+    var vv       = window.visualViewport;
+    var isOpen   = false;
+    var resetTimer;
+
+    /* Adapta el desplegable al área VISIBLE: cuando sale el teclado de iOS/Android,
+       el panel sube con él en vez de quedar tapado o descolocado. */
+    function fit() {
+      var keyboard = false;
+      if (vv) {
+        overlay.style.top = Math.round(vv.offsetTop) + 'px';
+        overlay.style.height = Math.round(vv.height) + 'px';
+        keyboard = window.innerHeight - vv.height > 120;   /* hay teclado abierto */
+      }
+      /* Compacto si hay teclado o si el formulario no cabe (móvil apaisado, pantallas bajas) */
+      overlay.classList.remove('kb');
+      if (keyboard || sheet.scrollHeight > sheet.clientHeight + 1) overlay.classList.add('kb');
+    }
+    function unfit() {
+      overlay.style.top = ''; overlay.style.height = '';
+      overlay.classList.remove('kb');
+    }
+    /* iOS anima el teclado: recalculamos varias veces hasta que se estabiliza */
+    function refit() { fit(); [120, 320, 650].forEach(function (ms) { setTimeout(function () { if (isOpen) fit(); }, ms); }); }
+
+    function open() {
+      if (isOpen) return;
+      isOpen = true;
+      clearTimeout(resetTimer);
+      overlay.removeAttribute('inert');
+      overlay.setAttribute('aria-hidden', 'false');
+      html.classList.add('sheet-open');
+      fit();
+      if (vv) { vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); }
+      window.addEventListener('resize', fit);
+      window.addEventListener('orientationchange', refit);
+      overlay.classList.add('open');
+      /* El focus va dentro del mismo toque del usuario: así iOS abre el teclado. */
+      user.focus({ preventScroll: true });
+    }
+
+    function close() {
+      if (!isOpen) return;
+      isOpen = false;
+      sheet.style.transform = '';
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.setAttribute('inert', '');
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      html.classList.remove('sheet-open');
+      if (vv) { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); }
+      window.removeEventListener('resize', fit);
+      window.removeEventListener('orientationchange', refit);
+      opener.focus({ preventScroll: true });
+      /* Al terminar la animación: limpia la clave y vuelve a ocultarla */
+      resetTimer = setTimeout(function () {
+        unfit();
+        pass.value = '';
+        setPassVisible(false);
+        note.textContent = '';
+        refresh();
+      }, 460);
+    }
+
+    opener.addEventListener('click', open);
+    overlay.addEventListener('click', function (e) {
+      if (e.target.closest('[data-close]')) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!isOpen) return;
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key === 'Tab') {           /* el foco no se escapa del desplegable */
+        var f = sheet.querySelectorAll('button:not([disabled]):not([hidden]), input, a[href]');
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+
+    /* ---- El teclado no se puede minimizar ----
+       1) Tocar en una zona "vacía" (fondo, textos, título…) no le quita el foco al campo.
+       2) Si aun así el campo pierde el foco (p. ej. con el "✓" de iOS), se lo devolvemos. */
+    var lastInput = user;
+    function keepKeyboard(e) {
+      if (!isOpen) return;
+      if (e.target.closest('input, a, button')) return;   /* los controles funcionan normal */
+      e.preventDefault();
+    }
+    overlay.addEventListener('pointerdown', keepKeyboard);
+    overlay.addEventListener('mousedown', keepKeyboard);
+    overlay.addEventListener('focusout', function (e) {
+      if (!isOpen || (e.target !== user && e.target !== pass)) return;
+      if (e.relatedTarget && sheet.contains(e.relatedTarget)) return;   /* pasó a otro control */
+      setTimeout(function () {
+        if (isOpen && document.hasFocus() && !sheet.contains(document.activeElement)) {
+          lastInput.focus({ preventScroll: true });
+        }
+      }, 0);
+    });
+
+    /* Al enfocar un campo (sale el teclado) reajustamos y lo dejamos a la vista */
+    [user, pass].forEach(function (inp) {
+      inp.addEventListener('focus', function () {
+        lastInput = inp;
+        refit();
+        setTimeout(function () { if (isOpen) inp.scrollIntoView({ block: 'nearest' }); }, 350);
+      });
+    });
+
+    /* ---- Campos ---- */
+    function refresh() {
+      clearBtn.hidden = !user.value;
+      submit.disabled = !(user.value.trim() && pass.value);
+    }
+    user.addEventListener('input', refresh);
+    pass.addEventListener('input', refresh);
+
+    /* Los botones dentro del campo NO le quitan el foco al input
+       (así el teclado del móvil no se cierra al tocarlos). */
+    [clearBtn, toggle].forEach(function (b) {
+      b.addEventListener('pointerdown', function (e) { e.preventDefault(); });
+      b.addEventListener('mousedown',   function (e) { e.preventDefault(); });
+    });
+
+    clearBtn.addEventListener('click', function () {
+      user.value = ''; refresh(); user.focus({ preventScroll: true });
+    });
+
+    /* Mostrar / ocultar clave */
+    function setPassVisible(show) {
+      var s = pass.selectionStart, e = pass.selectionEnd, hadFocus = document.activeElement === pass;
+      pass.type = show ? 'text' : 'password';
+      toggle.classList.toggle('is-visible', show);
+      toggle.setAttribute('aria-pressed', String(show));
+      toggle.setAttribute('aria-label', show ? 'Ocultar clave de acceso' : 'Mostrar clave de acceso');
+      if (hadFocus) { try { pass.setSelectionRange(s, e); } catch (_) {} }
+    }
+    toggle.addEventListener('click', function () {
+      setPassVisible(pass.type === 'password');
+    });
+
+    /* Intro en "Usuario" pasa a la clave */
+    user.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); pass.focus({ preventScroll: true }); }
+    });
+
+    /* Demo: no se envía ni se guarda ningún dato */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (submit.disabled) return;
+      note.textContent = 'Esto es una página de demostración: no se ha enviado ningún dato.';
+    });
+  })();
+</script>
+</body>
+</html>
